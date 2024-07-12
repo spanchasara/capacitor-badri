@@ -142,14 +142,16 @@ var nativeBridge = (function (exports) {
     const CAPACITOR_HTTP_INTERCEPTOR = '/_capacitor_http_interceptor_';
     const CAPACITOR_HTTPS_INTERCEPTOR = '/_capacitor_https_interceptor_';
     // TODO: export as Cap function
-    const isRelativeOrProxyUrl = (url) => !url ||
-        !(url.startsWith('http:') || url.startsWith('https:')) ||
-        url.indexOf(CAPACITOR_HTTP_INTERCEPTOR) > -1 ||
-        url.indexOf(CAPACITOR_HTTPS_INTERCEPTOR) > -1;
+    const isRelativeOrProxyUrl = (url) => {
+        return (!url ||
+            !(url.startsWith('http:') || url.startsWith('https:')) ||
+            url.indexOf(CAPACITOR_HTTP_INTERCEPTOR) > -1 ||
+            url.indexOf(CAPACITOR_HTTPS_INTERCEPTOR) > -1);
+    };
     // TODO: export as Cap function
     const createProxyUrl = (url, win) => {
         var _a, _b;
-        if (isRelativeOrProxyUrl(url))
+        if (url.includes('socket') || isRelativeOrProxyUrl(url))
             return url;
         const proxyUrl = new URL(url);
         const bridgeUrl = new URL((_b = (_a = win.Capacitor) === null || _a === void 0 ? void 0 : _a.getServerUrl()) !== null && _b !== void 0 ? _b : '');
@@ -325,6 +327,7 @@ var nativeBridge = (function (exports) {
             win.Ionic.WebView = IonicWebView;
         };
         const initLogger = (win, cap) => {
+            var _a;
             const BRIDGED_CONSOLE_METHODS = [
                 'debug',
                 'error',
@@ -498,6 +501,8 @@ var nativeBridge = (function (exports) {
                         doPatchHttp = true;
                     }
                 }
+                (_a = win.console) === null || _a === void 0 ? void 0 : _a.log('doPatchHttplog: ' + doPatchHttp);
+                cap.logJs('doPatchHttp: ' + doPatchHttp, 'info');
                 if (doPatchHttp) {
                     // fetch patch
                     window.fetch = async (resource, options) => {
